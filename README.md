@@ -7,20 +7,18 @@
 An advanced Intelligent Transportation System (ITS) designed for real-time vehicle detection, tracking, speed measurement using OpenCV Homography Perspective Transformation, and adaptive vehicle body color extraction.
 
 ---
-
-## 🎥 Demo Video
-
+## 🎬 Demo Video
 
 
+https://github.com/user-attachments/assets/e7dca7d4-195c-407c-bad2-9c1b11ace0c8
 
-https://github.com/user-attachments/assets/348a9cfa-1048-4d6a-8abe-704f678ec466
+
 
 
 
 
 
 ---
-
 ## 🌟 Key Features
 
 - 🚘 **Real-Time Vehicle Detection & Tracking**:
@@ -59,6 +57,71 @@ https://github.com/user-attachments/assets/348a9cfa-1048-4d6a-8abe-704f678ec466
                                  │ OpenCV Homography      │ ◄─┘
                                  │ Real-World Speed (m/s) │
                                  └────────────────────────┘
+```
 
+### 1. Homography Perspective Transformation Matrix
+In roadside cameras, vertical pixel movement near the horizon represents significantly larger real-world distances than pixel movement near the camera. We establish a perspective mapping matrix `M`:
 
+`SRC_PTS -> cv2.getPerspectiveTransform -> DST_PTS (Meters)`
 
+- **Source Camera Quadrilateral (`SRC_ROAD_PTS`)**: Selected road plane coordinates in `1280x720` frame.
+- **Destination Metric Grid (`DST_ROAD_PTS`)**: Real-world dimensions (`8.0m` width × `35.0m` length).
+
+### 2. Vehicle Body Hood Sampling & Color Classification
+To extract pure paint color, the crop region is restricted to:
+
+`Crop = Frame[y1 + 0.40 * h : y1 + 0.80 * h,  x1 + 0.20 * w : x1 + 0.80 * w]`
+
+HSV Color Thresholds:
+- **Black**: `V < 55`
+- **White**: `S < 40` & `V > 160`
+- **Gray**: `S < 40` & `V <= 160`
+- **Chromatic**: Categorized via Hue (`H`) for Red, Orange, Yellow, Green, Blue, and Violet.
+
+---
+
+## 🛠️ Project Structure
+
+```text
+VehicleSpeedTracking/
+├── main.py              # Core execution script (Detection, Tracking, Speed & Color)
+├── tracker.py           # Centroid tracking module
+├── requirements.txt     # Python dependency list
+├── video.mp4            # Input traffic video
+├── yolov8n.pt           # YOLOv8 nano pre-trained weights
+├── docs/
+│   └── changelog.md     # Architectural changelog & version history
+└── README.md            # Project documentation
+```
+
+---
+
+## ⚙️ Installation & Usage
+
+### 1. Prerequisites
+- Python 3.8+
+- OpenCV (`opencv-python`)
+- Ultralytics (`ultralytics`)
+- NumPy (`numpy`)
+
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run Application
+Ensure `video.mp4` is located in the project directory, then run:
+```bash
+python main.py
+```
+
+Press `q` to terminate execution.
+
+---
+
+## 📊 Visual Output Format
+
+Each vehicle bounding box displays:
+- **Vehicle ID & Speed**: `ID:5  98 km/h`
+- **Color Swatch Square**: `■` 14x14px filled square with true car hood color.
+- **Hex Code**: `#6A6D72` below the bounding box.
